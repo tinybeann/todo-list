@@ -86,3 +86,17 @@ module.exports.createPost = async (req, res) => {
     data: task
   });
 }
+
+module.exports.editPatch = async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+
+  await Task.updateOne({
+    _id: id
+  }, data);
+
+  res.json({
+    code: "success",
+    message: "Cập nhật công việc thành công!"
+  });
+}
