@@ -127,6 +127,16 @@ module.exports.editPatch = async (req, res) => {
   });
 }
 
+module.exports.deleteTask = async (req, res) => {
+  const id = req.params.id;
+  await Task.updateOne({ _id: id }, { deleted: true });
+
+  res.json({
+    code: "success",
+    message: "Xóa thành công!"
+  });
+};
+
 module.exports.deleteMultiPatch = async (req, res) => {
   const ids = req.body.ids;
 
