@@ -1,7 +1,7 @@
 const User = require("../../models/user.model");
 
 module.exports.requireAuth = async (req, res, next) => {
-  if(!req.headers.authorization) {
+  if (!req.headers.authorization) {
     res.json({
       code: "error",
       message: "Vui lòng gửi kèm theo token!"
@@ -16,13 +16,15 @@ module.exports.requireAuth = async (req, res, next) => {
     deleted: false
   });
 
-  if(!existUser) {
+  if (!existUser) {
     res.json({
       code: "error",
       message: "Token không hợp lệ!"
     });
     return;
   }
+
+  req.user = existUser;
 
   next();
 }

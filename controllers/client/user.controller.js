@@ -175,7 +175,6 @@ module.exports.resetPassword = async (req, res) => {
 module.exports.profile = async (req, res) => {
   const token = req.body.token;
 
-
   if(!token) {
     res.json({
       code: "error",
