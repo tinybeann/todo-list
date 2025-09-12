@@ -2,6 +2,10 @@ const Task = require("../../models/task.model");
 
 module.exports.index = async (req, res) => {
   const find = {
+    $or: [
+      { createdBy: req.user.id },
+      { listUser: req.user.id }
+    ],
     deleted: false
   }
   if (req.query.status) {
@@ -32,7 +36,7 @@ module.exports.index = async (req, res) => {
 
 
   // Search
-  if(req.query.keyword) {
+  if (req.query.keyword) {
     const regex = new RegExp(req.query.keyword, "i");
     find.title = regex;
   }
@@ -44,7 +48,11 @@ module.exports.index = async (req, res) => {
     .skip(skip)
     .sort(sort);
 
-  res.json(tasks);
+  res.json({
+    code: "success",
+    message: "Thành công!",
+    data: tasks
+  });
 }
 
 module.exports.detail = async (req, res) => {
@@ -52,10 +60,26 @@ module.exports.detail = async (req, res) => {
 
   const task = await Task.findOne({
     _id: id,
+    $or: [
+      { createdBy: req.user.id },
+      { listUser: req.user.id }
+    ],
     deleted: false
   });
 
-  res.json(task);
+  if (!task) {
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    });
+    return;
+  }
+
+  res.json({
+    code: "success",
+    message: "Thành công!",
+    data: task
+  });
 }
 
 module.exports.changeMultiPatch = async (req, res) => {
@@ -78,7 +102,7 @@ module.exports.createPost = async (req, res) => {
   const data = req.body;
 
   data.createdBy = req.user.id;
-  
+
   const task = new Task(data);
   await task.save();
 
