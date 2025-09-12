@@ -124,3 +124,32 @@ module.exports.forgotPassword = async (req, res) => {
     message: "Gửi mã OTP thành công!"
   })
 }
+
+
+module.exports.otpPassword = async (req, res) => {
+  const email = req.body.email;
+  const otp = req.body.otp;
+
+  const existRecord = await ForgotPassword.findOne({
+    email: email,
+    otp: otp
+  });
+
+  if(!existRecord) {
+    res.json({
+      code: "error",
+      message: "Mã OTP không hợp lệ!"
+    });
+    return;
+  }
+
+  const user = await User.findOne({
+    email: email
+  });
+
+  res.json({
+    code: "success",
+    message: "Mã OTP hợp lệ!",
+    token: user.token
+  });
+}
