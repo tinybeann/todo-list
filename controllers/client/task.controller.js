@@ -110,6 +110,74 @@ export const changeStatus = async (req, res) => {
   }
 };
 
+// Thay đổi tiêu đề 1 task
+export const changeTitle = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const { title } = req.body;
+
+    await Task.updateOne({ _id: taskId }, { title });
+
+    res.json({
+      code: 'success',
+      message: 'Cập nhật tiêu đề task thành công',
+    });
+  } catch (error) {
+    res.status(500).json({ code: 'error', message: error.message });
+  }
+};
+
+// Thay đổi tg bắt đầu 1 task
+export const changeTimeStart = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const { timeStart } = req.body;
+
+    await Task.updateOne({ _id: taskId }, { timeStart });
+
+    res.json({
+      code: 'success',
+      message: 'Cập nhật thời gian bắt đầu task thành công',
+    });
+  } catch (error) {
+    res.status(500).json({ code: 'error', message: error.message });
+  }
+};
+
+// Thay đổi tg kết thúc 1 task
+export const changeTimeFinish = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const { timeFinish } = req.body;
+
+    await Task.updateOne({ _id: taskId }, { timeFinish });
+
+    res.json({
+      code: 'success',
+      message: 'Cập nhật thời gian kết thúc task thành công',
+    });
+  } catch (error) {
+    res.status(500).json({ code: 'error', message: error.message });
+  }
+};
+
+// Thay đổi nội dung 1 task
+export const changeContent = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const { content } = req.body;
+
+    await Task.updateOne({ _id: taskId }, { content });
+
+    res.json({
+      code: 'success',
+      message: 'Cập nhật nội dung task thành công',
+    });
+  } catch (error) {
+    res.status(500).json({ code: 'error', message: error.message });
+  }
+};
+
 // Xóa nhiều task (soft delete)
 export const deleteMany = async (req, res) => {
   try {
