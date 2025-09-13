@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-
+import { useGeminiAi } from './helpers/useGeminiAi.helper.js';
 import { connect } from './config/database.js';
 import routeClient from './routes/client/index.route.js';
 
@@ -25,8 +25,10 @@ app.use(cors());
 // Parse application/json
 app.use(bodyParser.json());
 
+console.log(await useGeminiAi("alo"));
 // Routes
 routeClient(app);
+
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
