@@ -8,6 +8,7 @@ const taskSchema = new mongoose.Schema(
     timeStart: Date,
     timeFinish: Date,
     createdBy: String,
+    weekDay: String,
     deleted: {
       type: Boolean,
       default: false,
