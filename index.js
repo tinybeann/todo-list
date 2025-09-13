@@ -25,7 +25,7 @@ app.use(cors());
 // Parse application/json
 app.use(bodyParser.json());
 
-console.log(await useGeminiAi("alo"));
+// console.log(await useGeminiAi("Hãy tạo ra một thời khóa biểu trong 7 ngày, mỗi ngày có 3-4 công việc. Trả về kết quả dưới dạng một **mảng JSON** (JSON Array). Mỗi phần tử trong mảng là một **JSON object**, đại diện cho một công việc. Mỗi đối tượng phải chứa các key sau: **'title'**, **'status'** (một trong các giá trị 'To Do', 'In Progress', 'Done'), **'content'**, **'listUser'** (mảng chứa 1 tên bất kỳ), **'priority'** (một trong các giá trị 'Low', 'Medium', 'High'), **'weekDay'** (một trong các giá trị từ 'monday' đến 'sunday'). Đừng trả về bất kỳ đoạn văn bản hay giải thích nào khác ngoài đoạn JSON."));
 // Routes
 routeClient(app);
 
