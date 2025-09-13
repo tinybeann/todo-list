@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
 
-const taskSchema = new mongoose.Schema(
+const projectSchema = new mongoose.Schema(
   {
     title: String,
-    status: String,
-    content: String,
-    timeStart: Date,
-    timeFinish: Date,
     createdBy: String,
+    createdBy: String,
+    listUser: Array,
+    listTask: Array,
     deleted: {
       type: Boolean,
       default: false,
@@ -19,6 +18,6 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-const Task = mongoose.model("Task", taskSchema, "tasks");
+const Task = mongoose.model("Project", projectSchema, "projects");
 
-module.exports = Task;
+module.exports = Project;
