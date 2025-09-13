@@ -13,6 +13,6 @@ router.get('/', index);
 router.get('/detail/:id', detailProject);
 router.post('/create', createProject);
 router.patch('/edit/:id', editProject);
-router.patch('/delete', deleteProject);
+router.delete('/delete/:id', deleteProject);
 
 export default router;
