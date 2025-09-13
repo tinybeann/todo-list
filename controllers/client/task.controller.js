@@ -37,6 +37,9 @@ export const createTask = async (req, res) => {
       return res.status(404).json({ code: 'error', message: 'Project không tồn tại' });
     }
 
+    // Gán createdBy từ user đã đăng nhập (giả sử middleware đã set req.user)
+    data.createdBy = req.user?.id || null;
+
     const task = new Task(data);
     await task.save();
 
@@ -52,6 +55,7 @@ export const createTask = async (req, res) => {
     res.status(500).json({ code: 'error', message: error.message });
   }
 };
+
 
 // Sửa 1 task
 export const editTask = async (req, res) => {
@@ -125,5 +129,72 @@ export const deleteMany = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ code: 'error', message: error.message });
+  }
+};
+
+// Thêm 1 user vào task
+export const addUserToTask = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ code: "error", message: "Thiếu userId" });
+    }
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ code: "error", message: "Task không tồn tại" });
+    }
+
+    // kiểm tra nếu user đã có trong listUser thì không thêm lại
+    if (task.listUser.includes(userId)) {
+      return res.status(400).json({ code: "error", message: "User đã tồn tại trong task" });
+    }
+
+    task.listUser.push(userId);
+    await task.save();
+
+    res.json({
+      code: "success",
+      message: "Thêm user vào task thành công",
+      data: task,
+    });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: error.message });
+  }
+};
+
+// Xóa 1 user khỏi 1 task
+export const removeUserFromTask = async (req, res) => {
+  try {
+    const { taskId } = req.params; 
+    const { userId } = req.body;        
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({
+        code: "error",
+        message: "Task không tồn tại",
+      });
+    }
+
+    // Xóa userId khỏi listUser
+    task.listUser = task.listUser.filter(
+      (user) => user.toString() !== userId.toString()
+    );
+
+    await task.save();
+
+    res.json({
+      code: "success",
+      message: "Xóa user khỏi task thành công",
+      data: task,
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: "error",
+      message: error.message,
+    });
   }
 };
