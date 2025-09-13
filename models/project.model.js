@@ -4,7 +4,6 @@ const projectSchema = new mongoose.Schema(
   {
     title: String,
     createdBy: String,
-    createdBy: String,
     listUser: Array,
     listTask: Array,
     deleted: {
@@ -18,6 +17,6 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-const Task = mongoose.model("Project", projectSchema, "projects");
+const Project = mongoose.model("Project", projectSchema, "projects");
 
 module.exports = Project;
