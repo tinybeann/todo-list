@@ -43,8 +43,8 @@ export const index = async (req, res) => {
 
   const projects = await Project
     .find(find)
-    .limit(limitItems)
-    .skip(skip)
+    // .limit(limitItems)
+    // .skip(skip)
     .sort(sort);
 
   res.json({
