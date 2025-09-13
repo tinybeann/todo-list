@@ -1,32 +1,33 @@
-const express = require("express");
-require("dotenv").config();
-const database = require("./config/database");
-const bodyParser = require('body-parser');
-const cors = require('cors');
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import bodyParser from 'body-parser';
 
-database.connect();
+import { connect } from './config/database.js';
+import routeClient from './routes/client/index.route.js';
+
+dotenv.config();
+connect();
 
 const app = express();
 const port = 3000;
 
-// // Tất cả tên miền được phép truy cập vào
+// Cho phép tất cả tên miền truy cập
 app.use(cors());
 
-// Cho phép 1 tên miền cụ thể được phép truy cập
+// Nếu muốn giới hạn tên miền cụ thể:
 // const corsOptions = {
 //   origin: 'http://example.com',
 //   optionsSuccessStatus: 200
-// }
-// cors(corsOptions);
+// };
+// app.use(cors(corsOptions));
 
-// parse application/json
+// Parse application/json
 app.use(bodyParser.json());
 
 // Routes
-const routeClient = require("./routes/client/index.route");
 routeClient(app);
 
-
 app.listen(port, () => {
-  console.log(`app listening on port ${3000}`);
-})
+  console.log(`App listening on port ${port}`);
+});

@@ -1,16 +1,14 @@
-const tasksRoute = require("./task.route");
-const usersRoute = require("./user.route");
-const projectRoute = require("./project.route");
+import tasksRoute from './task.route.js';
+import usersRoute from './user.route.js';
+import projectRoute from './project.route.js';
 
-const userMiddleware = require("../../middlewares/client/user.middleware");
+import { requireAuth } from '../../middlewares/client/user.middleware.js';
 
-module.exports = (app) => {
+export default (app) => {
+  app.use('/tasks', requireAuth, tasksRoute);
+  // app.use('/tasks', tasksRoute);
 
-  app.use("/tasks", userMiddleware.requireAuth, tasksRoute);
-  // app.use("/tasks", tasksRoute);
+  app.use('/projects', requireAuth, projectRoute);
 
-  app.use("/projects", userMiddleware.requireAuth, projectRoute);
-
-  app.use("/users", usersRoute);
-
-}
+  app.use('/users', usersRoute);
+};

@@ -1,14 +1,14 @@
-const Task = require("../../models/task.model");
-const Project = require("../../models/project.model");
+import Task from '../../models/task.model.js';
+import Project from '../../models/project.model.js';
 
 // Lấy danh sách task trong 1 project
-module.exports.getTasksByProject = async (req, res) => {
+export const getTasksByProject = async (req, res) => {
   try {
     const projectId = req.params.projectId;
 
     const project = await Project.findById(projectId);
     if (!project) {
-      return res.status(404).json({ code: "error", message: "Project không tồn tại" });
+      return res.status(404).json({ code: 'error', message: 'Project không tồn tại' });
     }
 
     const tasks = await Task.find({ 
@@ -17,45 +17,44 @@ module.exports.getTasksByProject = async (req, res) => {
     });
 
     res.json({
-      code: "success",
-      message: "Danh sách task của project",
+      code: 'success',
+      message: 'Danh sách task của project',
       data: tasks,
     });
   } catch (error) {
-    res.status(500).json({ code: "error", message: error.message });
+    res.status(500).json({ code: 'error', message: error.message });
   }
 };
 
 // Thêm 1 task vào project
-module.exports.createTask = async (req, res) => {
+export const createTask = async (req, res) => {
   try {
     const projectId = req.params.projectId;
     const data = req.body;
 
     const project = await Project.findById(projectId);
     if (!project) {
-      return res.status(404).json({ code: "error", message: "Project không tồn tại" });
+      return res.status(404).json({ code: 'error', message: 'Project không tồn tại' });
     }
 
     const task = new Task(data);
     await task.save();
 
-    // Thêm task vào listTask của project
     project.listTask.push(task._id);
     await project.save();
 
     res.json({
-      code: "success",
-      message: "Thêm task thành công",
+      code: 'success',
+      message: 'Thêm task thành công',
       data: task,
     });
   } catch (error) {
-    res.status(500).json({ code: "error", message: error.message });
+    res.status(500).json({ code: 'error', message: error.message });
   }
 };
 
 // Sửa 1 task
-module.exports.editTask = async (req, res) => {
+export const editTask = async (req, res) => {
   try {
     const taskId = req.params.taskId;
     const data = req.body;
@@ -63,16 +62,16 @@ module.exports.editTask = async (req, res) => {
     await Task.updateOne({ _id: taskId }, data);
 
     res.json({
-      code: "success",
-      message: "Cập nhật task thành công",
+      code: 'success',
+      message: 'Cập nhật task thành công',
     });
   } catch (error) {
-    res.status(500).json({ code: "error", message: error.message });
+    res.status(500).json({ code: 'error', message: error.message });
   }
 };
 
 // Xóa 1 task (soft delete)
-module.exports.deleteTask = async (req, res) => {
+export const deleteTask = async (req, res) => {
   try {
     const taskId = req.params.taskId;
 
@@ -82,16 +81,16 @@ module.exports.deleteTask = async (req, res) => {
     );
 
     res.json({
-      code: "success",
-      message: "Xóa task thành công",
+      code: 'success',
+      message: 'Xóa task thành công',
     });
   } catch (error) {
-    res.status(500).json({ code: "error", message: error.message });
+    res.status(500).json({ code: 'error', message: error.message });
   }
 };
 
 // Thay đổi trạng thái 1 task
-module.exports.changeStatus = async (req, res) => {
+export const changeStatus = async (req, res) => {
   try {
     const taskId = req.params.taskId;
     const { status } = req.body;
@@ -99,20 +98,20 @@ module.exports.changeStatus = async (req, res) => {
     await Task.updateOne({ _id: taskId }, { status });
 
     res.json({
-      code: "success",
-      message: "Cập nhật trạng thái task thành công",
+      code: 'success',
+      message: 'Cập nhật trạng thái task thành công',
     });
   } catch (error) {
-    res.status(500).json({ code: "error", message: error.message });
+    res.status(500).json({ code: 'error', message: error.message });
   }
 };
 
 // Xóa nhiều task (soft delete)
-module.exports.deleteMany = async (req, res) => {
+export const deleteMany = async (req, res) => {
   try {
-    const { ids } = req.body; // [{}, {}]
+    const { ids } = req.body;
     if (!Array.isArray(ids)) {
-      return res.status(400).json({ code: "error", message: "Dữ liệu không hợp lệ" });
+      return res.status(400).json({ code: 'error', message: 'Dữ liệu không hợp lệ' });
     }
 
     await Task.updateMany(
@@ -121,10 +120,10 @@ module.exports.deleteMany = async (req, res) => {
     );
 
     res.json({
-      code: "success",
-      message: "Xóa nhiều task thành công",
+      code: 'success',
+      message: 'Xóa nhiều task thành công',
     });
   } catch (error) {
-    res.status(500).json({ code: "error", message: error.message });
+    res.status(500).json({ code: 'error', message: error.message });
   }
 };

@@ -1,18 +1,20 @@
-const express = require("express");
+import express from 'express';
+import {
+  register,
+  login,
+  forgotPassword,
+  otpPassword,
+  resetPassword,
+  profile
+} from '../../controllers/client/user.controller.js';
+
 const router = express.Router();
 
-const controller = require("../../controllers/client/user.controller");
+router.post('/register', register);
+router.post('/login', login);
+router.post('/password/forgot', forgotPassword);
+router.post('/password/otp', otpPassword);
+router.post('/password/reset', resetPassword);
+router.get('/profile', profile);
 
-router.post("/register", controller.register);
-
-router.post("/login", controller.login);
-
-router.post("/password/forgot", controller.forgotPassword);
-
-router.post("/password/otp", controller.otpPassword);
-
-router.post("/password/reset", controller.resetPassword);
-
-router.get("/profile", controller.profile);
-
-module.exports = router;
+export default router;

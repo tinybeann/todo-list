@@ -1,31 +1,28 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-module.exports.sendMail = (email, subject, text) => {
-  // Create a transporter object
+export const sendMail = (email, subject, text) => {
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false, // use false for STARTTLS; true for SSL on port 465
+    secure: false, // STARTTLS
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     }
   });
 
-  // Configure the mailoptions object
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: subject,
+    subject,
     html: text
   };
 
-  // Send the email
-  transporter.sendMail(mailOptions, function(error, info){
+  transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log('Error:', error);
     } else {
-      console.log('Email sent: ', info.response);
+      console.log('Email sent:', info.response);
     }
   });
-}
+};

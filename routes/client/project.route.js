@@ -1,16 +1,18 @@
-const express = require("express");
+import express from 'express';
+import {
+  index,
+  detailProject,
+  createProject,
+  editProject,
+  deleteProject
+} from '../../controllers/client/project.controller.js';
+
 const router = express.Router();
 
-const controller = require("../../controllers/client/project.controller");
+router.get('/', index);
+router.get('/detail/:id', detailProject);
+router.post('/create', createProject);
+router.patch('/edit/:id', editProject);
+router.patch('/delete', deleteProject);
 
-router.get("/", controller.index);
-
-router.get("/detail/:id", controller.detailProject);
-
-router.post("/create", controller.createProject);
-
-router.patch("/edit/:id", controller.editProject);
-
-router.patch("/delete", controller.deleteProject);
-
-module.exports = router;
+export default router;
