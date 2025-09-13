@@ -1,153 +1,130 @@
 const Task = require("../../models/task.model");
+const Project = require("../../models/project.model");
 
-module.exports.index = async (req, res) => {
-  const find = {
-    $or: [
-      { createdBy: req.user.id },
-      { listUser: req.user.id }
-    ],
-    deleted: false
-  }
-  if (req.query.status) {
-    find.status = req.query.status;
-  }
+// Lấy danh sách task trong 1 project
+module.exports.getTasksByProject = async (req, res) => {
+  try {
+    const projectId = req.params.projectId;
 
-  // Sort
-  const sort = {};
-  if (req.query.sortKey && req.query.sortValue) {
-    sort[req.query.sortKey] = req.query.sortValue;
-  }
-  // End Sort
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ code: "error", message: "Project không tồn tại" });
+    }
 
-  // Pagination
-  let limitItems = 4;
-  let page = 1;
-
-  if (req.query.page) {
-    page = parseInt(req.query.page);
-  }
-
-  if (req.query.limit) {
-    limitItems = parseInt(req.query.limit);
-  }
-
-  const skip = (page - 1) * limitItems;
-  // End Pagination
-
-
-  // Search
-  if (req.query.keyword) {
-    const regex = new RegExp(req.query.keyword, "i");
-    find.title = regex;
-  }
-  // End Search
-
-  const tasks = await Task
-    .find(find)
-    .limit(limitItems)
-    .skip(skip)
-    .sort(sort);
-
-  res.json({
-    code: "success",
-    message: "Thành công!",
-    data: tasks
-  });
-}
-
-module.exports.detail = async (req, res) => {
-  const id = req.params.id;
-
-  const task = await Task.findOne({
-    _id: id,
-    $or: [
-      { createdBy: req.user.id },
-      { listUser: req.user.id }
-    ],
-    deleted: false
-  });
-
-  if (!task) {
-    res.json({
-      code: "error",
-      message: "Id không hợp lệ!"
+    const tasks = await Task.find({ 
+      _id: { $in: project.listTask },
+      deleted: false
     });
-    return;
+
+    res.json({
+      code: "success",
+      message: "Danh sách task của project",
+      data: tasks,
+    });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: error.message });
   }
-
-  res.json({
-    code: "success",
-    message: "Thành công!",
-    data: task
-  });
-}
-
-module.exports.changeMultiPatch = async (req, res) => {
-  const status = req.body.status;
-  const ids = req.body.ids;
-
-  await Task.updateMany({
-    _id: { $in: ids }
-  }, {
-    status: status
-  });
-
-  res.json({
-    code: "success",
-    message: "Thành công!"
-  })
-}
-
-module.exports.createPost = async (req, res) => {
-  const data = req.body;
-
-  data.createdBy = req.user.id;
-
-  const task = new Task(data);
-  await task.save();
-
-  res.json({
-    code: "success",
-    message: "Tạo công việc thành công!",
-    data: task
-  });
-}
-
-module.exports.editPatch = async (req, res) => {
-  const id = req.params.id;
-  const data = req.body;
-
-  await Task.updateOne({
-    _id: id
-  }, data);
-
-  res.json({
-    code: "success",
-    message: "Cập nhật công việc thành công!"
-  });
-}
-
-module.exports.deleteTask = async (req, res) => {
-  const id = req.params.id;
-  await Task.updateOne({ _id: id }, { deleted: true });
-
-  res.json({
-    code: "success",
-    message: "Xóa thành công!"
-  });
 };
 
-module.exports.deleteMultiPatch = async (req, res) => {
-  const ids = req.body.ids;
+// Thêm 1 task vào project
+module.exports.createTask = async (req, res) => {
+  try {
+    const projectId = req.params.projectId;
+    const data = req.body;
 
-  await Task.updateMany({
-    _id: { $in: ids }
-  }, {
-    deleted: true
-  });
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ code: "error", message: "Project không tồn tại" });
+    }
 
-  res.json({
-    code: "success",
-    message: "Xóa thành công!"
-  })
-}
+    const task = new Task(data);
+    await task.save();
+
+    // Thêm task vào listTask của project
+    project.listTask.push(task._id);
+    await project.save();
+
+    res.json({
+      code: "success",
+      message: "Thêm task thành công",
+      data: task,
+    });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: error.message });
+  }
+};
+
+// Sửa 1 task
+module.exports.editTask = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const data = req.body;
+
+    await Task.updateOne({ _id: taskId }, data);
+
+    res.json({
+      code: "success",
+      message: "Cập nhật task thành công",
+    });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: error.message });
+  }
+};
+
+// Xóa 1 task (soft delete)
+module.exports.deleteTask = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+
+    await Task.updateOne(
+      { _id: taskId },
+      { deleted: true, deletedAt: new Date() }
+    );
+
+    res.json({
+      code: "success",
+      message: "Xóa task thành công",
+    });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: error.message });
+  }
+};
+
+// Thay đổi trạng thái 1 task
+module.exports.changeStatus = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const { status } = req.body;
+
+    await Task.updateOne({ _id: taskId }, { status });
+
+    res.json({
+      code: "success",
+      message: "Cập nhật trạng thái task thành công",
+    });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: error.message });
+  }
+};
+
+// Xóa nhiều task (soft delete)
+module.exports.deleteMany = async (req, res) => {
+  try {
+    const { ids } = req.body; // [{}, {}]
+    if (!Array.isArray(ids)) {
+      return res.status(400).json({ code: "error", message: "Dữ liệu không hợp lệ" });
+    }
+
+    await Task.updateMany(
+      { _id: { $in: ids } },
+      { deleted: true, deletedAt: new Date() }
+    );
+
+    res.json({
+      code: "success",
+      message: "Xóa nhiều task thành công",
+    });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: error.message });
+  }
+};

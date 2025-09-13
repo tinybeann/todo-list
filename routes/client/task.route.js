@@ -3,20 +3,16 @@ const router = express.Router();
 
 const controller = require("../../controllers/client/task.controller");
 
-router.get("/", controller.index);
+router.get("/:projectId", controller.getTasksByProject);
 
-router.get("/detail/:id", controller.detail);
+router.post("/create/:projectId", controller.createTask);
 
-router.patch("/change-multi", controller.changeMultiPatch);
+router.patch("/edit/:taskId", controller.editTask);
 
-router.post("/create", controller.createPost);
+router.delete("/delete/:taskId", controller.deleteTask);
 
-router.patch("/edit/:id", controller.editPatch);
+router.patch("/change-status/:taskId/status", controller.changeStatus);
 
-router.patch("/delete-task", controller.deleteTask);
-
-router.patch("/delete-multi", controller.deleteMultiPatch);
-
-
+router.delete("/delete-many", controller.deleteMany);
 
 module.exports = router;
