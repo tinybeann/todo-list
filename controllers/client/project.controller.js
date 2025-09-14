@@ -213,3 +213,67 @@ export const createProjectFromAI = async (req, res) => {
     });
   }
 };
+
+export const addUsersToProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const users = req.body;  // Lấy req.body trực tiếp làm mảng
+
+    if (!Array.isArray(users) || users.length === 0) {
+      return res.status(400).json({
+        code: 'error',
+        message: 'Dữ liệu users phải là mảng không rỗng.',
+      });
+    }
+
+    // Validate role của từng user
+    for (const user of users) {
+      if (!user.userId || !user.role || !['view', 'edit'].includes(user.role)) {
+        return res.status(400).json({
+          code: 'error',
+          message: 'Mỗi user phải có userId và role hợp lệ (view hoặc edit).',
+        });
+      }
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({
+        code: 'error',
+        message: 'Project không tồn tại.',
+      });
+    }
+
+    // Lọc bỏ những user đã tồn tại trong project.userRoles
+    const newUsers = users.filter(
+      (newUser) =>
+        !project.userRoles.some(
+          (ur) => ur.userId.toString() === newUser.userId
+        )
+    );
+
+    if (newUsers.length === 0) {
+      return res.status(400).json({
+        code: 'error',
+        message: 'Tất cả người dùng đã tồn tại trong dự án.',
+      });
+    }
+
+    // Thêm newUsers vào userRoles
+    project.userRoles.push(...newUsers);
+
+    await project.save();
+
+    res.json({
+      code: 'success',
+      message: 'Thêm người dùng vào dự án thành công.',
+      data: project,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      code: 'server-error',
+      message: 'Lỗi server.',
+    });
+  }
+};
