@@ -5,7 +5,7 @@ const projectSchema = new mongoose.Schema(
     title: String,
     createdBy: String,
     listUser: Array,
-    listTask: Array,
+    listTask: Array, 
     deleted: {
       type: Boolean,
       default: false,
@@ -15,9 +15,20 @@ const projectSchema = new mongoose.Schema(
       default: false,
     },
     deletedAt: Date,
+    
+    userRoles: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
+        role: {
+          type: String,
+          enum: ['view', 'edit'],  
+          default: 'view', 
+        },
+      },
+    ],
   },
   {
-    timestamps: true,
+    timestamps: true,  // Tự động thêm createdAt và updatedAt
   }
 );
 

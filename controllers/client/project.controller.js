@@ -85,13 +85,21 @@ export const createProject = async (req, res) => {
   const data = req.body;
   data.createdBy = req.user.id;
 
+  // Gán luôn userRoles với creator có quyền 'edit'
+  data.userRoles = [
+    {
+      userId: req.user.id,
+      role: 'edit',
+    },
+  ];
+
   const project = new Project(data);
   await project.save();
 
   res.json({
     code: 'success',
     message: 'Tạo dự án thành công!',
-    data: project
+    data: project,
   });
 };
 
