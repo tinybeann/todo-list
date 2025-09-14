@@ -148,24 +148,26 @@ export const resetPassword = async (req, res) => {
 };
 
 export const profile = async (req, res) => {
-  const { token } = req.body;
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    res.json({
+  if (!authHeader) {
+    return res.json({
       code: 'error',
-      message: 'Vui lòng gửi kèm theo token!'
+      message: 'Vui lòng gửi kèm theo token ở Authorization header!'
     });
-    return;
   }
 
-  const user = await User.findOne({ token, deleted: false }).select('id fullName email');
+  // Tách "Bearer <token>"
+  const token = authHeader.split(' ')[1];
+
+  const user = await User.findOne({ token, deleted: false })
+    .select('_id fullName email');
 
   if (!user) {
-    res.json({
+    return res.json({
       code: 'error',
       message: 'Token không hợp lệ!'
     });
-    return;
   }
 
   res.json({
