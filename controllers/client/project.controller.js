@@ -1,6 +1,7 @@
 import { useGeminiAi } from '../../helpers/useGeminiAi.helper.js';
 import Project from '../../models/project.model.js';
 import Task from '../../models/task.model.js';
+import User from '../../models/user.model.js';
 
 export const index = async (req, res) => {
   const find = {
@@ -274,6 +275,78 @@ export const addUsersToProject = async (req, res) => {
     res.status(500).json({
       code: 'server-error',
       message: 'Lỗi server.',
+    });
+  }
+};
+
+export const addUserToProjectByEmail = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { email, role } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Bạn phải gửi email",
+      });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy project",
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `Không tìm thấy người dùng với email: ${email}`,
+      });
+    }
+
+    // Khởi tạo nếu undefined
+    if (!project.userRoles) {
+      project.userRoles = [];
+    }
+    if (!project.listUser) {
+      project.listUser = [];
+    }
+
+    // Thêm hoặc cập nhật userRoles
+    const existUserRole = project.userRoles.find(
+      (u) => u.userId.toString() === user._id.toString()
+    );
+    if (!existUserRole) {
+      project.userRoles.push({
+        userId: user._id,
+        role: role || "view",
+      });
+    } else {
+      existUserRole.role = role || existUserRole.role;
+    }
+
+    // Thêm userId vào listUser nếu chưa có (giả sử listUser là mảng ObjectId)
+    const userIdStr = user._id.toString();
+    const listUserStrs = project.listUser.map((id) => id.toString());
+    if (!listUserStrs.includes(userIdStr)) {
+      project.listUser.push(user._id);
+    }
+
+    await project.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Thêm user vào project thành công",
+      data: project,
+    });
+  } catch (error) {
+    console.error("Lỗi khi thêm user vào project:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server khi thêm user vào project",
     });
   }
 };
