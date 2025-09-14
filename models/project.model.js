@@ -10,6 +10,10 @@ const projectSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    share: {
+      type: Boolean,
+      default: false,
+    },
     deletedAt: Date,
   },
   {
