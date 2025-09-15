@@ -191,6 +191,8 @@ export const createProjectFromAI = async (req, res) => {
         { $set: { listTask: newTasksIds } }
       );
 
+      savedProject.listTask = newTasksIds;
+
       return res.status(201).json({
         code: 'success',
         message: 'Đã tạo project và task thành công từ AI.',
@@ -283,6 +285,7 @@ export const addUserToProjectByEmail = async (req, res) => {
   try {
     const { projectId } = req.params;
     const { email, role } = req.body;
+    console.log(req.body);
 
     if (!email) {
       return res.status(400).json({
